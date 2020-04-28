@@ -1,14 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { useDispatch } from "react-redux";
-import {
-  moviesSearchData,
-  clearSearchMovies,
-  pageNumberHandler,
-} from "../../ducks/movies";
+import { moviesSearchData } from "../../ducks/movies";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import InputBase from "@material-ui/core/InputBase";
 import MenuIcon from "@material-ui/icons/Menu";
 import SearchIcon from "@material-ui/icons/Search";
@@ -40,7 +37,7 @@ const SearchAppBar = () => {
         }
       />
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar position="sticky">
           <Toolbar className={classes.toolBar}>
             <IconButton
               edge="start"
@@ -56,27 +53,29 @@ const SearchAppBar = () => {
               <div className={classes.searchIcon}>
                 <SearchIcon />
               </div>
-              <InputBase
-                placeholder="Enter movie…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                onChange={(event) => {
-                  if (event.target.value.trim() === "") {
-                    setIsSearching(false);
-                  } else {
-                    setIsSearching(true);
-                  }
-                  dispatch(clearSearchMovies());
-                  dispatch(pageNumberHandler(1));
-                  searchDebounceHandler(event.target.value);
-                }}
-                inputProps={{ "aria-label": "search" }}
-              />
-              {isSearching ? (
-                <SearchList setIsSearching={setIsSearching} />
-              ) : null}
+              <ClickAwayListener onClickAway={() => setIsSearching(false)}>
+                <div>
+                  <InputBase
+                    placeholder="Enter movie…"
+                    classes={{
+                      root: classes.inputRoot,
+                      input: classes.inputInput,
+                    }}
+                    onChange={(event) => {
+                      if (event.target.value.trim() === "") {
+                        setIsSearching(false);
+                      } else {
+                        setIsSearching(true);
+                      }
+                      searchDebounceHandler(event.target.value);
+                    }}
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                  {isSearching ? (
+                    <SearchList setIsSearching={setIsSearching} />
+                  ) : null}
+                </div>
+              </ClickAwayListener>
             </div>
 
             <div className={classes.linkWrapper}>

@@ -9,14 +9,21 @@ import Typography from "@material-ui/core/Typography";
 import { Link, withRouter } from "react-router-dom";
 import { useStyles } from "./style";
 
-const MediaCard = ({ id, poster_path, title, overview, history }) => {
+const MediaCard = ({
+  id,
+  poster_path,
+  title,
+  overview,
+  history,
+  slide = false,
+}) => {
   const classes = useStyles();
   return (
-    <Card className={classes.card}>
+    <Card className={slide ? classes.cardSlide : classes.card}>
       <CardActionArea>
         <CardMedia
-          onClick={() => history.push("film/" + id)}
-          className={classes.media}
+          onClick={() => history.replace("/film/" + id)}
+          className={slide ? classes.mediaSlide : classes.media}
           image={poster_path}
           title={title}
         />
@@ -29,13 +36,15 @@ const MediaCard = ({ id, poster_path, title, overview, history }) => {
           </Typography>
         </CardContent>
       </CardActionArea>
-      <CardActions>
-        <Button variant="contained" color="primary">
-          <Link className={classes.btnLink} to={"film/" + id}>
-            Learn More
-          </Link>
-        </Button>
-      </CardActions>
+      {slide ? null : (
+        <CardActions>
+          <Button variant="contained" color="primary">
+            <Link className={classes.btnLink} to={"/film/" + id}>
+              Learn More
+            </Link>
+          </Button>
+        </CardActions>
+      )}
     </Card>
   );
 };

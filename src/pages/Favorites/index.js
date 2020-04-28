@@ -5,17 +5,25 @@ import { useStyles } from "./style";
 
 const Favorites = () => {
   const classes = useStyles();
-  const favorites = useSelector((state) => state.movies.favorites);
-  const favoritesList = favorites.map(({ id, title }) => (
-    <li>
-      <Link to={`/film/${id}`}>{title}</Link>
-    </li>
-  ));
+  const savedFavoriteList = JSON.parse(localStorage.getItem("favorites"));
+  const { favorites } = useSelector(({ movies }) => movies.favorites);
+  let favoritesList = [];
+  if (savedFavoriteList) {
+    favoritesList = savedFavoriteList;
+  } else {
+    favoritesList = favorites;
+  }
 
   return (
     <div className={classes.favorites}>
       <h2>Movies which you liked: </h2>
-      <ul>{favorites ? favoritesList : <li>Your favourite film</li>}</ul>
+      <ul>
+        {favoritesList.map(({ id, title }) => (
+          <li key={id}>
+            <Link to={`/film/${id}`}>{title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

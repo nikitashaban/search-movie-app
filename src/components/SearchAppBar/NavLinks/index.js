@@ -12,7 +12,8 @@ const NavLinks = ({ setIsDrawerOpen, isSideDrawer = false }) => {
         onClick={() => (isSideDrawer ? setIsDrawerOpen(false) : {})}
         className={classes.navigationItem}
         activeClassName={classes.navigationItemActive}
-        to="/home"
+        to="/"
+        exact
       >
         <HomeIcon /> &nbsp; Home
       </NavLink>

@@ -3,17 +3,16 @@ import { fetchMovie } from "../helpers/helpers";
 const ITEMS_HAVE_ERRORED = "ITEMS_HAVE_ERRORED";
 const MOVIES_ARE_LOADING = "MOVIES_ARE_LOADING";
 const FETCH_MOVIES_SUCCESS = "FETCH_MOVIES_SUCCESS";
-const SEARCH_MOVIES_SUCCESS = "SEARCH_MOVIES_SUCCESS";
 const FETCH_DETAILS_SUCCESS = "FETCH_DETAILS_SUCCESS";
+const FETCH_SEARCHED_MOVIES = "FETCH_SEARCHED_MOVIES";
+const FETCH_RECOMMENDED_MOVIES = "FETCH_RECOMMENDED_MOVIES";
+const FETCH_SIMILAR_MOVIES = "FETCH_SIMILAR_MOVIES";
 const IS_MOVIE_FAVORITE = "IS_MOVIE_FAVORITE";
 const PAGE_NUMBER = "PAGE_NUMBER";
-const SEARCH_INPUT = "SEARCH_INPUT";
-const CLEAR_SEARCHED_MOVIES = "CLEAR_SEARCHED_MOVIES";
 const FETCH_GENRES_SUCCESS = "FETCH_GENRES_SUCCESS";
 
 const initialState = {
   page: 1,
-  searchInput: "",
   topRateMovies: {
     topRateMoviesList: [],
     total_results: 0,
@@ -22,11 +21,19 @@ const initialState = {
     searchedMoviesList: [],
     total_results: 0,
   },
+  recommendedMovies: {
+    recommendedMoviesList: [],
+    total_recommended: 0,
+  },
+  similarMovies: {
+    similarMoviesList: [],
+    total_similar: 0,
+  },
   hasErrored: false,
   isLoading: true,
   genres: [],
   filmDetails: {},
-  favorites: [],
+  favorites: JSON.parse(localStorage.getItem("favorites")) || [],
 };
 
 //reducer
@@ -41,6 +48,14 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         isLoading: payload,
+      };
+    case FETCH_SEARCHED_MOVIES:
+      return {
+        ...state,
+        searchedMovies: {
+          searchedMoviesList: [...payload.results],
+          total_results: payload.total_results,
+        },
       };
     case FETCH_MOVIES_SUCCESS:
       return {
@@ -58,23 +73,20 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         filmDetails: payload,
       };
-    case SEARCH_MOVIES_SUCCESS:
+    case FETCH_RECOMMENDED_MOVIES:
       return {
         ...state,
-        searchedMovies: {
-          searchedMoviesList: [
-            ...state.searchedMovies.searchedMoviesList,
-            ...payload.results,
-          ],
-          total_results: payload.total_results,
+        recommendedMovies: {
+          recommendedMoviesList: [...payload.results],
+          total_recommended: payload.total_results,
         },
       };
-    case CLEAR_SEARCHED_MOVIES:
+    case FETCH_SIMILAR_MOVIES:
       return {
         ...state,
-        searchedMovies: {
-          ...state.searchedMovies,
-          searchedMoviesList: [],
+        similarMovies: {
+          similarMoviesList: [...payload.results],
+          total_similar: payload.total_results,
         },
       };
     case IS_MOVIE_FAVORITE:
@@ -86,12 +98,6 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         page: payload,
-      };
-    }
-    case SEARCH_INPUT: {
-      return {
-        ...state,
-        searchInput: payload,
       };
     }
     case FETCH_GENRES_SUCCESS: {
@@ -119,27 +125,24 @@ export const fetchMoviesSuccess = (payload) => ({
   type: FETCH_MOVIES_SUCCESS,
   payload,
 });
-export const searchedFilms = (payload) => ({
-  type: FETCH_MOVIES_SUCCESS,
+export const setSearchedFilms = (payload) => ({
+  type: FETCH_SEARCHED_MOVIES,
   payload,
 });
-export const saveSearchInput = (payload) => ({
-  type: SEARCH_INPUT,
-  payload,
-});
-export const clearSearchMovies = () => ({
-  type: CLEAR_SEARCHED_MOVIES,
-});
-export const fetchMoviesDetailsSuccess = (payload) => ({
+export const setMoviesDetails = (payload) => ({
   type: FETCH_DETAILS_SUCCESS,
   payload,
 });
-export const searchMoviesSuccess = (payload) => ({
-  type: SEARCH_MOVIES_SUCCESS,
+export const setFavoriteMovie = (payload) => ({
+  type: IS_MOVIE_FAVORITE,
   payload,
 });
-export const isMovieFavorite = (payload) => ({
-  type: IS_MOVIE_FAVORITE,
+export const setSimilarMovies = (payload) => ({
+  type: FETCH_SIMILAR_MOVIES,
+  payload,
+});
+export const setRecommendedMovies = (payload) => ({
+  type: FETCH_RECOMMENDED_MOVIES,
   payload,
 });
 export const pageNumberHandler = (payload) => ({ type: PAGE_NUMBER, payload });
@@ -156,23 +159,22 @@ export const moviesFetchData = () => {
     const { page } = getState().movies;
 
     fetchMovie("movie/popular?", "&page=" + page)
-      .then((data) => dispatch(fetchMoviesSuccess(data)))
-      .then(() => dispatch(pageNumberHandler(page + 1)))
+      .then((data) => {
+        dispatch(fetchMoviesSuccess(data));
+        dispatch(pageNumberHandler(page + 1));
+      })
       .catch(() => dispatch(moviesHaveErrored(true)));
   };
 };
 
 // fetching movies according to search input
 export const moviesSearchData = (input) => {
-  return (dispatch, getState) => {
-    const { page } = getState().movies;
-    dispatch(saveSearchInput(input));
+  return (dispatch) => {
     dispatch(moviesAreLoading(true));
-    fetchMovie(`search/movie?query=${input}`, "&page=" + page)
-      .then((data) => dispatch(searchMoviesSuccess(data)))
-      .then(() => {
+    fetchMovie(`search/movie?query=${input}&`)
+      .then((data) => {
+        dispatch(setSearchedFilms(data));
         dispatch(moviesAreLoading(false));
-        dispatch(pageNumberHandler(page + 1));
       })
       .catch(() => dispatch(moviesHaveErrored(true)));
   };
@@ -183,22 +185,40 @@ export const favoriteMoviesHandler = (currentMovie) => {
   return (dispatch, getState) => {
     const { favorites } = getState().movies;
     const isFavorite = favorites.some((movie) => movie.id === currentMovie.id);
-    const updatedList = favorites.filter((el) => el.id !== currentMovie.id);
 
     if (isFavorite) {
-      dispatch(isMovieFavorite(updatedList));
+      const updatedList = favorites.filter((el) => el.id !== currentMovie.id);
+      localStorage.setItem("favorites", JSON.stringify(updatedList));
+      dispatch(setFavoriteMovie(updatedList));
     } else {
-      dispatch(isMovieFavorite([...favorites, currentMovie]));
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify([...favorites, currentMovie])
+      );
+      dispatch(setFavoriteMovie([...favorites, currentMovie]));
     }
   };
 };
 
 //search for details of movie
-export const moviesDetailsData = (id) => {
+export const getMovieDetails = (id) => {
   return (dispatch) => {
     fetchMovie(`movie/${id}?`)
-      .then((detail) => dispatch(fetchMoviesDetailsSuccess(detail)))
+      .then((info) => dispatch(setMoviesDetails(info)))
       .catch(() => dispatch(moviesHaveErrored(true)));
+  };
+};
+
+//recieve recommended movies according to id
+
+export const getSpecificMovies = (id, type) => {
+  return (dispatch) => {
+    fetchMovie(`movie/${id}/${type}?`).then((data) => {
+      if (type === "recommendations") {
+        dispatch(setRecommendedMovies(data));
+      }
+      if (type === "similar") dispatch(setSimilarMovies(data));
+    });
   };
 };
 

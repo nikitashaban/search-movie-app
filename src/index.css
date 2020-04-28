@@ -26,6 +26,5 @@ a {
   color: #3f51b5;
 }
 .MuiPaper-root.MuiAppBar-root.MuiAppBar-positionStatic {
-  position: static;
   transform: none;
 }

@@ -42,11 +42,6 @@ const SearchList = ({ setIsSearching }) => {
             </li>
           ))
         )}
-        <li className={classes.searchListLastItem}>
-          <Link onClick={() => setIsSearching(false)} to="/search">
-            View all results
-          </Link>
-        </li>
       </ul>
     </div>
   );

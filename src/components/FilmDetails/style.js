@@ -3,12 +3,11 @@ import { makeStyles } from "@material-ui/core/styles";
 export const useStyles = makeStyles((theme) => ({
   wrapper: {
     margin: "0 auto",
-    marginTop: 25,
     display: "flex",
     maxWidth: 1100,
     justifyContent: "space-between",
     "& h1": {
-      marginRight: 100,
+      marginTop: 50,
     },
     "& h4": {
       color: "grey",
@@ -31,5 +30,10 @@ export const useStyles = makeStyles((theme) => ({
     "& div:nth-child(2)": {
       paddingLeft: 15,
     },
+  },
+  recommended: {
+    margin: "0 auto",
+    maxWidth: 1100,
+    marginTop: 30,
   },
 }));

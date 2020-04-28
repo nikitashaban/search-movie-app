@@ -27,27 +27,10 @@ export const useStyles = makeStyles((theme) => ({
     color: "white",
     textDecoration: "none",
     padding: 0,
-  },
-  searchListLastItem: {
-    backgroundColor: "rgb(51, 153, 255)",
-    marginTop: 10,
     transition: "1s",
     "&:hover": {
-      boxShadow: "10px 10px 5px 0px rgba(0, 0, 0, 0.75)",
-    },
-    "& a": {
-      boxSizing: "border-box",
-      color: "white",
-      display: "block",
-      width: "100%",
-      height: "100%",
-      padding: "10px 0 10px 10px",
-      transition: "0.6s",
-    },
-    "& a:hover": {
-      display: "block",
-      transition: "0.6s",
-      paddingLeft: "25px",
+      paddingLeft: 30,
+      transition: "1s",
     },
   },
   genreInfo: {
