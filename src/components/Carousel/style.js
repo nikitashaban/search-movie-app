@@ -30,6 +30,10 @@ export const useStyles = makeStyles((theme) => ({
     left: 0,
     "& svg": {
       color: theme.palette.primary.dark,
+      paddingLeft: 3,
+    },
+    "&:focus": {
+      outline: "none",
     },
   },
   btnNext: {
