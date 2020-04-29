@@ -179,7 +179,7 @@ export const moviesSearchData = (input) => {
         dispatch(moviesAreLoading(false));
       })
       .catch((error) => {
-        dispatch(setSnackbar({ message: error.message, type: "error" }));
+        console.log(error.message);
       });
   };
 };
