@@ -5,7 +5,9 @@ import { useStyles } from "./style";
 
 const Favorites = () => {
   const classes = useStyles();
-  const savedFavoriteList = JSON.parse(localStorage.getItem("favorites"));
+  const savedFavoriteList = localStorage.getItem("favorites")
+    ? JSON.parse(localStorage.getItem("favorites"))
+    : [];
   const { favorites } = useSelector(({ movies }) => movies.favorites);
   let favoritesList = [];
   if (savedFavoriteList) {

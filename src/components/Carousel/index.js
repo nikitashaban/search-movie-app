@@ -10,14 +10,15 @@ import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import { useStyles } from "./style";
 
-const Carousel = ({ content, totalSlides }) => {
+const Carousel = ({ content, totalSlides, visibleSlides }) => {
   const classes = useStyles();
   return (
     <CarouselProvider
       className={classes.carousel}
       naturalSlideWidth={100}
-      naturalSlideHeight={31}
+      naturalSlideHeight={34}
       totalSlides={totalSlides}
+      visibleSlides={visibleSlides}
       infinite={true}
       isPlaying={true}
     >

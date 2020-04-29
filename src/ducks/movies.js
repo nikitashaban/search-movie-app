@@ -1,6 +1,5 @@
 import { fetchMovie } from "../helpers/helpers";
 
-const ITEMS_HAVE_ERRORED = "ITEMS_HAVE_ERRORED";
 const MOVIES_ARE_LOADING = "MOVIES_ARE_LOADING";
 const FETCH_MOVIES_SUCCESS = "FETCH_MOVIES_SUCCESS";
 const FETCH_DETAILS_SUCCESS = "FETCH_DETAILS_SUCCESS";
@@ -10,6 +9,7 @@ const FETCH_SIMILAR_MOVIES = "FETCH_SIMILAR_MOVIES";
 const IS_MOVIE_FAVORITE = "IS_MOVIE_FAVORITE";
 const PAGE_NUMBER = "PAGE_NUMBER";
 const FETCH_GENRES_SUCCESS = "FETCH_GENRES_SUCCESS";
+const IS_SNACKBAR_OPEN = "IS_SNACKBAR_OPEN";
 
 const initialState = {
   page: 1,
@@ -29,7 +29,7 @@ const initialState = {
     similarMoviesList: [],
     total_similar: 0,
   },
-  hasErrored: false,
+  snackbar: false,
   isLoading: true,
   genres: [],
   filmDetails: {},
@@ -39,10 +39,10 @@ const initialState = {
 //reducer
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case ITEMS_HAVE_ERRORED:
+    case IS_SNACKBAR_OPEN:
       return {
         ...state,
-        hasErrored: payload,
+        snackbar: payload,
       };
     case MOVIES_ARE_LOADING:
       return {
@@ -113,8 +113,8 @@ export default (state = initialState, { type, payload }) => {
 
 //actions creators
 
-export const moviesHaveErrored = (payload) => ({
-  type: ITEMS_HAVE_ERRORED,
+export const setSnackbar = (payload) => ({
+  type: IS_SNACKBAR_OPEN,
   payload,
 });
 export const moviesAreLoading = (payload) => ({
@@ -163,7 +163,9 @@ export const moviesFetchData = () => {
         dispatch(fetchMoviesSuccess(data));
         dispatch(pageNumberHandler(page + 1));
       })
-      .catch(() => dispatch(moviesHaveErrored(true)));
+      .catch((error) => {
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
+      });
   };
 };
 
@@ -176,7 +178,9 @@ export const moviesSearchData = (input) => {
         dispatch(setSearchedFilms(data));
         dispatch(moviesAreLoading(false));
       })
-      .catch(() => dispatch(moviesHaveErrored(true)));
+      .catch((error) => {
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
+      });
   };
 };
 
@@ -205,7 +209,9 @@ export const getMovieDetails = (id) => {
   return (dispatch) => {
     fetchMovie(`movie/${id}?`)
       .then((info) => dispatch(setMoviesDetails(info)))
-      .catch(() => dispatch(moviesHaveErrored(true)));
+      .catch((error) => {
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
+      });
   };
 };
 
@@ -213,20 +219,26 @@ export const getMovieDetails = (id) => {
 
 export const getSpecificMovies = (id, type) => {
   return (dispatch) => {
-    fetchMovie(`movie/${id}/${type}?`).then((data) => {
-      if (type === "recommendations") {
-        dispatch(setRecommendedMovies(data));
-      }
-      if (type === "similar") dispatch(setSimilarMovies(data));
-    });
+    fetchMovie(`movie/${id}/${type}?`)
+      .then((data) => {
+        if (type === "recommendations") {
+          dispatch(setRecommendedMovies(data));
+        }
+        if (type === "similar") dispatch(setSimilarMovies(data));
+      })
+      .catch((error) => {
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
+      });
   };
 };
 
 //fetch genres
 export const fetchGenresHandler = () => {
   return (dispatch) => {
-    fetchMovie("genre/movie/list?").then((res) =>
-      dispatch(fetchGenresSuccess(res.genres))
-    );
+    fetchMovie("genre/movie/list?")
+      .then((res) => dispatch(fetchGenresSuccess(res.genres)))
+      .catch((error) => {
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
+      });
   };
 };

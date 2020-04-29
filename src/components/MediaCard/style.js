@@ -8,8 +8,8 @@ export const useStyles = makeStyles({
     zIndex: 0,
   },
   cardSlide: {
-    width: 200,
-    minHeight: 330,
+    width: 230,
+    minHeight: 310,
     height: 330,
     "& h2": {
       fontSize: 12,
@@ -20,7 +20,7 @@ export const useStyles = makeStyles({
     zIndex: 0,
   },
   mediaSlide: {
-    height: 280,
+    height: 260,
     zIndex: 0,
   },
   btnLink: {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Carousel from "../Carousel";
 import { Slide } from "pure-react-carousel";
@@ -10,14 +10,16 @@ import {
   setRecommendedMovies,
 } from "../../ducks/movies";
 import Fab from "@material-ui/core/Fab";
-import MediaCard from "../MediaCard/";
+import { Link } from "react-router-dom";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import { useStyles } from "./style";
 import IconButton from "@material-ui/core/IconButton";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import useWindowSize from "../../customHooks/useWindowSize";
 const poster = "https://image.tmdb.org/t/p/w185_and_h278_bestv2/";
 
 const FilmDetails = ({ match, history }) => {
+  const [width] = useWindowSize();
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getMovieDetails(match.params.id));
@@ -35,24 +37,34 @@ const FilmDetails = ({ match, history }) => {
   const { similarMoviesList, total_similar } = useSelector(
     ({ movies }) => movies.similarMovies
   );
+  const [slidesAmount, setSlidesAmount] = useState(4);
+  useLayoutEffect(() => {
+    if (width < 1000) {
+      setSlidesAmount(3);
+    }
+    if (width < 700) {
+      setSlidesAmount(2);
+    }
+    if (width < 500) {
+      setSlidesAmount(1);
+    }
+    if (width > 1000) {
+      setSlidesAmount(4);
+    }
+  }, [width]);
+
   const recommendedMovieSlides = recommendedMoviesList.map((movie) => (
     <Slide key={movie.id}>
-      <MediaCard
-        id={movie.id}
-        title={movie.title}
-        poster_path={poster + movie.poster_path}
-        slide={true}
-      />
+      <Link to={"/film/" + movie.id}>
+        <img src={poster + movie.poster_path} alt={movie.title} />
+      </Link>
     </Slide>
   ));
   const similarMovieSlides = similarMoviesList.map((movie) => (
     <Slide key={movie.id}>
-      <MediaCard
-        id={movie.id}
-        title={movie.title}
-        poster_path={poster + movie.poster_path}
-        slide={true}
-      />
+      <Link to={"/film/" + movie.id}>
+        <img src={poster + movie.poster_path} alt={movie.title} />
+      </Link>
     </Slide>
   ));
   return (
@@ -97,8 +109,9 @@ const FilmDetails = ({ match, history }) => {
         <div className={classes.recommended}>
           <h2>Films recommended to {currentFilmDetails.title}:</h2>
           <Carousel
+            visibleSlides={slidesAmount}
             content={recommendedMovieSlides}
-            totalSlides={recommendedMovieSlides.length / 4}
+            totalSlides={recommendedMovieSlides.length}
           />
         </div>
       ) : (
@@ -111,8 +124,9 @@ const FilmDetails = ({ match, history }) => {
         <div className={classes.recommended}>
           <h2>Films similar to {currentFilmDetails.title}:</h2>
           <Carousel
+            visibleSlides={slidesAmount}
             content={similarMovieSlides}
-            totalSlides={similarMovieSlides.length / 4}
+            totalSlides={similarMovieSlides.length}
           />
         </div>
       ) : (

@@ -3,9 +3,5 @@ export const fetchMovie = (url, page) => {
 
   return fetch(
     `https://api.themoviedb.org/3/${url}api_key=${apiKey}&language=en-US${page}&include_adult=false`
-  )
-    .then((response) => response.json())
-    .catch((error) => {
-      alert(error.message);
-    });
+  ).then((response) => response.json());
 };
