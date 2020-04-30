@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { debounce } from "lodash";
 import { useDispatch } from "react-redux";
-import { moviesSearchData } from "../../ducks/movies";
+import { moviesSearchData, setSearchedFilms } from "../../ducks/movies";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -63,11 +63,16 @@ const SearchAppBar = () => {
                     }}
                     onChange={(event) => {
                       if (event.target.value.trim() === "") {
+                        dispatch(
+                          setSearchedFilms({
+                            results: [],
+                          })
+                        );
                         setIsSearching(false);
                       } else {
                         setIsSearching(true);
+                        searchDebounceHandler(event.target.value);
                       }
-                      searchDebounceHandler(event.target.value);
                     }}
                     inputProps={{ "aria-label": "search" }}
                   />

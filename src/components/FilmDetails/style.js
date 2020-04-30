@@ -5,7 +5,6 @@ export const useStyles = makeStyles((theme) => ({
     margin: "0 auto",
     display: "flex",
     maxWidth: 1100,
-    justifyContent: "space-between",
     "& h1": {
       marginTop: 50,
     },
@@ -31,7 +30,7 @@ export const useStyles = makeStyles((theme) => ({
       paddingLeft: 15,
     },
   },
-  recommended: {
+  additional: {
     margin: "0 auto",
     maxWidth: 1100,
     marginTop: 30,

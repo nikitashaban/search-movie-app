@@ -24,10 +24,12 @@ export default function CustomSnackbar() {
   const snackbar = useSelector(({ movies }) => movies.snackbar);
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [snackbarInfo, setSnackbarInfo] = React.useState({});
 
   useEffect(() => {
     if (snackbar.type) {
-      setOpen({ type: snackbar.type, message: snackbar.message });
+      setOpen(true);
+      setSnackbarInfo({ type: snackbar.type, message: snackbar.message });
     }
   }, [snackbar]);
 
@@ -37,9 +39,10 @@ export default function CustomSnackbar() {
     }
     dispatch(setSnackbar(false));
     setOpen(false);
+    setSnackbarInfo({});
   };
   let snackType;
-  if (snackbar.type === "error") {
+  if (snackbarInfo.type === "error") {
     snackType = "error";
   } else if (snackbar.type === "warning") {
     snackType = "warning";
@@ -52,7 +55,7 @@ export default function CustomSnackbar() {
     <div className={classes.root}>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity={snackType}>
-          {snackbar.message}
+          {snackbarInfo.message}
         </Alert>
       </Snackbar>
     </div>

@@ -53,7 +53,7 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         searchedMovies: {
-          searchedMoviesList: [...payload.results],
+          searchedMoviesList: payload.results,
           total_results: payload.total_results,
         },
       };
@@ -77,7 +77,7 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         recommendedMovies: {
-          recommendedMoviesList: [...payload.results],
+          recommendedMoviesList: payload.results,
           total_recommended: payload.total_results,
         },
       };
@@ -85,7 +85,7 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         similarMovies: {
-          similarMoviesList: [...payload.results],
+          similarMoviesList: payload.results,
           total_similar: payload.total_results,
         },
       };
@@ -179,7 +179,7 @@ export const moviesSearchData = (input) => {
         dispatch(moviesAreLoading(false));
       })
       .catch((error) => {
-        console.log(error.message);
+        dispatch(setSnackbar({ message: error.message, type: "error" }));
       });
   };
 };
